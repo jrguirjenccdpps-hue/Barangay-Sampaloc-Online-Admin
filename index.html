@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barangay Sampaloc - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .time-display {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 6px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.pending { border-left-color: var(--danger); }
+        .stat-card.processing { border-left-color: var(--warning); }
+        .stat-card.completed { border-left-color: var(--success); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--gray-100);
+        }
+
+        .stat-card.pending .stat-icon { background: #fee2e2; }
+        .stat-card.processing .stat-icon { background: #fef3c7; }
+        .stat-card.completed .stat-icon { background: #d1fae5; }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Filters Section */
+        .filters-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filters-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-select, .form-input {
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Table Section */
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        thead {
+            background: var(--gray-100);
+        }
+
+        th {
+            padding: 0.875rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Ticket Number */
+        .ticket-number {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.875rem;
+        }
+
+        /* User Info */
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .user-contact {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 0.375rem;
+            flex-wrap: nowrap;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--gray-800);
+            word-break: break-word;
+        }
+
+        .detail-value.id-number {
+            font-family: monospace;
+            background: var(--gray-100);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            background: var(--gray-100);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--gray-800);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 2000;
+            animation: toastSlide 0.3s ease;
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        @keyframes toastSlide {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+
+        .toast-success {
+            background: var(--success);
+        }
+
+        .toast-error {
+            background: var(--danger);
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+            background-size: 200% 100%;
+            animation: skeleton 1.5s infinite;
+            border-radius: 4px;
+            height: 1rem;
+        }
+
+        @keyframes skeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            background: white;
+            border: 2px solid var(--gray-200);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .quick-action-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-value {
+                font-size: 1.875rem;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-btns {
+                flex-direction: column;
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .header, .filters-card, .action-btns, .modal-footer {
+                display: none !important;
+            }
+
+            .table-card {
+                box-shadow: none;
+            }
+
+            body {
+                background: white;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🏛️</div>
+                <span>Barangay Sampaloc Admin</span>
+            </div>
+            <div class="header-actions">
+                <span class="time-display" id="currentTime">Loading...</span>
+                <button class="btn-icon" onclick="refreshAll()" title="Refresh Data">🔄</button>
+                <button class="btn btn-primary" onclick="openSheet()">📊 Open Sheet</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="quick-action-btn" onclick="filterStatus('pending')">
+                <span class="quick-action-icon">⏳</span>
+                <span>View Pending</span>
+            </button>
+            <button class="quick-action-btn" onclick="filterStatus('processing')">
+                <span class="quick-action-icon">🔄</span>
+                <span>In Progress</span>
+            </button>
+            <button class="quick-action-btn" onclick="filterStatus('completed')">
+                <span class="quick-action-icon">✅</span>
+                <span>Completed Today</span>
+            </button>
+            <button class="quick-action-btn" onclick="showAll()">
+                <span class="quick-action-icon">📋</span>
+                <span>All Requests</span>
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="statTotal">-</div>
+                        <div class="stat-label">Total Requests</div>
+                    </div>
+                    <div class="stat-icon">📊</div>
+                </div>
+                <div class="stat-change">All time</div>
+            </div>
+
+            <div class="stat-card pending">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="statPending">-</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-icon">⏳</div>
+                </div>
+                <div class="stat-change">Needs attention</div>
+            </div>
+
+            <div class="stat-card processing">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="statProcessing">-</div>
+                        <div class="stat-label">Processing</div>
+                    </div>
+                    <div class="stat-icon">🔄</div>
+                </div>
+                <div class="stat-change">In progress</div>
+            </div>
+
+            <div class="stat-card completed">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="statCompleted">-</div>
+                        <div class="stat-label">Completed Today</div>
+                    </div>
+                    <div class="stat-icon">✅</div>
+                </div>
+                <div class="stat-change" id="completedChange">+0 today</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-card">
+            <div class="filters-header">
+                <div class="filters-title">
+                    🔍 Filter Requests
+                </div>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="form-select" id="filterStatus" onchange="loadRequests()">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="processing">Processing</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Date</label>
+                    <input type="date" class="form-input" id="filterDate" onchange="loadRequests()">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Service Type</label>
+                    <select class="form-select" id="filterService" onchange="filterByService()">
+                        <option value="all">All Services</option>
+                        <option value="clearance">Barangay Clearance</option>
+                        <option value="indigency">Certificate of Indigency</option>
+                        <option value="id">Barangay ID</option>
+                        <option value="residency">Certificate of Residency</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Search</label>
+                    <input type="text" class="form-input" id="searchInput" placeholder="Name, ticket, or ID..." onkeyup="searchTable()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Requests Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">📋 Recent Requests</div>
+                <div class="table-actions">
+                    <button class="btn btn-sm btn-info" onclick="exportCSV()">📥 Export CSV</button>
+                    <button class="btn btn-sm" onclick="printTable()" style="background: #6b7280; color: white;">🖨️ Print</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="requestsTable">
+                    <thead>
+                        <tr>
+                            <th>Ticket #</th>
+                            <th>Queue</th>
+                            <th>Service</th>
+                            <th>Requester</th>
+                            <th>Contact</th>
+                            <th>Purpose</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="9" class="empty-state">
+                                <div class="loading"></div>
+                                <p>Loading requests...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Request Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="copyRequestDetails()" style="background: #6b7280; color: white;">📋 Copy Details</button>
+                <button class="btn btn-warning" id="processBtn" onclick="updateStatus('Processing')">▶️ Mark Processing</button>
+                <button class="btn btn-success" id="completeBtn" onclick="updateStatus('Completed')">✓ Mark Complete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span id="toastMessage">Operation successful</span>
+    </div>
+
+<script>
+    // ==========================================
+    // CONFIGURATION - Replace with your details
+    // ==========================================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwlNJ7TmO257DUGG8Y9ohaITPxmmjEgEs_o6f-lEofPYQdYpCuEFIjYMnKeUH7-tz2G/exec';
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1LQlQVUcTX-PjZLEJVbCHan9bPOF1If_YC-CIIwmCJYw/edit';
+    
+    // ==========================================
+    // STATE
+    // ==========================================
+    let currentRequests = [];
+    let currentTicket = null;
+    let autoRefreshInterval = null;
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function() {
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Set today's date as default
+        document.getElementById('filterDate').valueAsDate = new Date();
+        
+        // Load initial data
+        loadStats();
+        loadRequests();
+        
+        // Auto refresh every 30 seconds
+        autoRefreshInterval = setInterval(() => {
+            loadStats();
+            loadRequests();
+        }, 30000);
+    });
+
+    // ==========================================
+    // TIME DISPLAY
+    // ==========================================
+    function updateTime() {
+        const now = new Date();
+        const options = { 
+            weekday: 'short', 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        document.getElementById('currentTime').textContent = now.toLocaleString('en-US', options);
+    }
+
+    // ==========================================
+    // DATA LOADING
+    // ==========================================
+    async function loadStats() {
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=getStats`);
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('statTotal').textContent = data.stats.total;
+                document.getElementById('statPending').textContent = data.stats.pending;
+                document.getElementById('statProcessing').textContent = data.stats.processing;
+                document.getElementById('statCompleted').textContent = data.stats.completed;
+                
+                // Update change indicator
+                const changeText = data.stats.completed > 0 ? `+${data.stats.completed} today` : 'No completions yet';
+                document.getElementById('completedChange').textContent = changeText;
+            }
+        } catch (error) {
+            console.error('Error loading stats:', error);
+            showToast('Failed to load statistics', 'error');
+        }
+    }
+
+    async function loadRequests() {
+        const status = document.getElementById('filterStatus').value;
+        const date = document.getElementById('filterDate').value;
+        
+        try {
+            let url = `${SCRIPT_URL}?action=getRequests`;
+            if (status !== 'all') url += `&status=${status}`;
+            if (date) url += `&date=${date}`;
+            
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.success) {
+                currentRequests = data.requests;
+                renderTable(currentRequests);
+            } else {
+                throw new Error(data.error);
+            }
+        } catch (error) {
+            console.error('Error loading requests:', error);
+            document.getElementById('tableBody').innerHTML = `
+                <tr>
+                    <td colspan="9" class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <div class="empty-title">Failed to load data</div>
+                        <p>Please check your connection and try again.</p>
+                        <button class="btn btn-primary" onclick="loadRequests()" style="margin-top: 1rem;">
+                            Retry
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // ==========================================
+    // TABLE RENDERING
+    // ==========================================
+    function renderTable(requests) {
+        const tbody = document.getElementById('tableBody');
+        if (!requests || requests.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div class="empty-title">No requests found</div>
+                        <p>Try adjusting your filters or check back later.</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = requests.map(req => {
+            // Safely handle potentially undefined values
+            const ticketNumber = req.ticketNumber || 'N/A';
+            const queueNumber = req.queueNumber || '-';
+            const serviceName = req.serviceName || 'Unknown';
+            const fullName = req.fullName || 'Unknown';
+            const contactNumber = req.contactNumber || '-';
+            const email = req.email || '';
+            const purpose = req.purpose || '-';
+            const otherPurpose = req.otherPurpose || '';
+            const status = req.status || 'Unknown';
+            const timestamp = req.timestamp ? new Date(req.timestamp).toLocaleTimeString('en-US', { 
+                hour: '2-digit', minute: '2-digit' 
+            }) : '-';
+            
+            const purposeDisplay = otherPurpose ? purpose + ': ' + otherPurpose : purpose;
+            const statusClass = status.toString().toLowerCase();
+            const emailDisplay = email ? '<br><small>' + email + '</small>' : '';
+            
+            // Only show action buttons if not completed
+            const actionButtons = status !== 'Completed' ? 
+                `<button class="btn btn-sm btn-warning" onclick="quickUpdate('${ticketNumber}', 'Processing')">Process</button>
+                 <button class="btn btn-sm btn-success" onclick="quickUpdate('${ticketNumber}', 'Completed')">Complete</button>` : 
+                '<span class="badge badge-completed">Done</span>';
+                
+            return `<tr>
+                <td class="ticket-number">${ticketNumber}</td>
+                <td>${queueNumber}</td>
+                <td>${serviceName}</td>
+                <td>
+                    <div class="user-info">
+                        <span class="user-name">${fullName}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="user-info">
+                        <span class="user-contact">${contactNumber}</span>
+                        ${emailDisplay}
+                    </div>
+                </td>
+                <td>${purposeDisplay}</td>
+                <td><span class="badge badge-${statusClass}">${status}</span></td>
+                <td>${timestamp}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn btn-sm btn-info" onclick="viewDetails('${ticketNumber}')">View</button>
+                        ${actionButtons}
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ==========================================
+    // FILTERING & SEARCH
+    // ==========================================
+    function filterStatus(status) {
+        document.getElementById('filterStatus').value = status;
+        loadRequests();
+    }
+
+    function showAll() {
+        document.getElementById('filterStatus').value = 'all';
+        document.getElementById('filterService').value = 'all';
+        document.getElementById('filterDate').value = '';
+        document.getElementById('searchInput').value = '';
+        loadRequests();
+    }
+
+    function filterByService() {
+        const service = document.getElementById('filterService').value;
+        if (service === 'all') {
+            renderTable(currentRequests);
+        } else {
+            const filtered = currentRequests.filter(r => r.serviceType === service);
+            renderTable(filtered);
+        }
+    }
+
+    function searchTable() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = currentRequests.filter(req => 
+            (req.fullName && req.fullName.toLowerCase().includes(searchTerm)) ||
+            (req.ticketNumber && req.ticketNumber.toLowerCase().includes(searchTerm)) ||
+            (req.contactNumber && req.contactNumber.includes(searchTerm)) ||
+            (req.idNumber && req.idNumber.toLowerCase().includes(searchTerm))
+        );
+        renderTable(filtered);
+    }
+
+    // ==========================================
+    // MODAL & DETAILS
+    // ==========================================
+    function viewDetails(ticketNumber) {
+        currentTicket = currentRequests.find(r => r.ticketNumber === ticketNumber);
+        if (!currentTicket) return;
+
+        const modalBody = document.getElementById('modalBody');
+        
+        // Build details HTML
+        modalBody.innerHTML = `
+            <div class="detail-section">
+                <div class="detail-title">Request Information</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Ticket Number</span>
+                        <span class="detail-value ticket-number">${currentTicket.ticketNumber}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Queue Number</span>
+                        <span class="detail-value">${currentTicket.queueNumber || '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Service Type</span>
+                        <span class="detail-value">${currentTicket.serviceName}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value">
+                            <span class="badge badge-${(currentTicket.status || 'unknown').toLowerCase()}">${currentTicket.status || 'Unknown'}</span>
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Date Submitted</span>
+                        <span class="detail-value">${currentTicket.timestamp ? new Date(currentTicket.timestamp).toLocaleString() : '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Est. Completion</span>
+                        <span class="detail-value">${currentTicket.estimatedCompletion ? new Date(currentTicket.estimatedCompletion).toLocaleDateString() : '-'}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-title">Personal Information</div>
+                <div class="detail-grid">
+                    <div class="detail-item" style="grid-column: span 2;">
+                        <span class="detail-label">Full Name</span>
+                        <span class="detail-value">${currentTicket.fullName}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Contact Number</span>
+                        <span class="detail-value">${currentTicket.contactNumber}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">${currentTicket.email || '-'}</span>
+                    </div>
+                    <div class="detail-item" style="grid-column: span 2;">
+                        <span class="detail-label">Complete Address</span>
+                        <span class="detail-value">${currentTicket.completeAddress}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-title">Request Details</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Purpose</span>
+                        <span class="detail-value">${currentTicket.purpose}</span>
+                    </div>
+                    ${currentTicket.otherPurpose ? `
+                    <div class="detail-item">
+                        <span class="detail-label">Other Purpose</span>
+                        <span class="detail-value">${currentTicket.otherPurpose}</span>
+                    </div>
+                    ` : ''}
+                    <div class="detail-item">
+                        <span class="detail-label">Valid ID Presented</span>
+                        <span class="detail-value">${currentTicket.validIDType}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">ID Number</span>
+                        <span class="detail-value id-number">${currentTicket.idNumber}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Show/hide action buttons based on status
+        const processBtn = document.getElementById('processBtn');
+        const completeBtn = document.getElementById('completeBtn');
+        
+        if (currentTicket.status === 'Completed') {
+            processBtn.style.display = 'none';
+            completeBtn.style.display = 'none';
+        } else if (currentTicket.status === 'Processing') {
+            processBtn.style.display = 'none';
+            completeBtn.style.display = 'inline-block';
+        } else {
+            processBtn.style.display = 'inline-block';
+            completeBtn.style.display = 'inline-block';
+        }
+
+        document.getElementById('detailModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('detailModal').classList.remove('active');
+        currentTicket = null;
+    }
+
+    function copyRequestDetails() {
+        if (!currentTicket) return;
+        
+        const text = `
+BARANGAY SAMPALOC - REQUEST DETAILS
+====================================
+Ticket Number: ${currentTicket.ticketNumber}
+Queue Number: ${currentTicket.queueNumber || 'N/A'}
+Service: ${currentTicket.serviceName}
+Status: ${currentTicket.status}
+Date: ${currentTicket.timestamp ? new Date(currentTicket.timestamp).toLocaleString() : '-'}
+
+REQUESTER INFORMATION:
+----------------------
+Name: ${currentTicket.fullName}
+Contact: ${currentTicket.contactNumber}
+Email: ${currentTicket.email || 'N/A'}
+Address: ${currentTicket.completeAddress}
+
+REQUEST DETAILS:
+----------------
+Purpose: ${currentTicket.purpose}${currentTicket.otherPurpose ? ' - ' + currentTicket.otherPurpose : ''}
+Valid ID: ${currentTicket.validIDType}
+ID Number: ${currentTicket.idNumber}
+
+For office use only.
+        `.trim();
+
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Details copied to clipboard!');
+        });
+    }
+
+    // ==========================================
+    // STATUS UPDATES - FIXED VERSION
+    // ==========================================
+    
+    // For table buttons (two parameters)
+    async function quickUpdate(ticketNumber, newStatus) {
+        if (!ticketNumber || !newStatus) {
+            console.error('Missing parameters:', ticketNumber, newStatus);
+            return;
+        }
+        if (!confirm(`Mark ${ticketNumber} as ${newStatus}?`)) return;
+        await performUpdate(ticketNumber, newStatus);
+    }
+
+    // For modal buttons (uses currentTicket)
+    async function updateStatus(newStatus) {
+        if (!currentTicket) {
+            showToast('No ticket selected', 'error');
+            return;
+        }
+        if (!confirm(`Mark ${currentTicket.ticketNumber} as ${newStatus}?`)) return;
+        
+        const success = await performUpdate(currentTicket.ticketNumber, newStatus);
+        if (success) {
+            closeModal();
+        }
+    }
+
+    // Core update function
+    async function performUpdate(ticketNumber, newStatus) {
+        try {
+            showToast('Updating...', 'success');
+            
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'updateStatus',
+                    ticketNumber: ticketNumber,
+                    newStatus: newStatus
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast(`Status updated to ${newStatus}`);
+                await loadRequests();
+                await loadStats();
+                return true;
+            } else {
+                throw new Error(data.error || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Error updating status:', error);
+            showToast('Failed to update status: ' + error.message, 'error');
+            return false;
+        }
+    }
+
+    // ==========================================
+    // UTILITIES
+    // ==========================================
+    function refreshAll() {
+        loadStats();
+        loadRequests();
+        showToast('Data refreshed!');
+    }
+
+    function openSheet() {
+        window.open(SHEET_URL, '_blank');
+    }
+
+    function exportCSV() {
+        if (currentRequests.length === 0) {
+            showToast('No data to export', 'error');
+            return;
+        }
+
+        const headers = ['Ticket Number', 'Queue', 'Service', 'Name', 'Contact', 'Email', 'Address', 'Purpose', 'ID Type', 'ID Number', 'Status', 'Date'];
+        const rows = currentRequests.map(req => [
+            req.ticketNumber,
+            req.queueNumber,
+            req.serviceName,
+            req.fullName,
+            req.contactNumber,
+            req.email,
+            req.completeAddress,
+            req.purpose + (req.otherPurpose ? `: ${req.otherPurpose}` : ''),
+            req.validIDType,
+            req.idNumber,
+            req.status,
+            req.timestamp ? new Date(req.timestamp).toLocaleString() : ''
+        ]);
+
+        let csv = headers.join(',') + '\n';
+        rows.forEach(row => {
+            csv += row.map(cell => `"${String(cell || '').replace(/"/g, '""')}"`).join(',') + '\n';
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `barangay-requests-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        showToast('CSV exported successfully!');
+    }
+
+    function printTable() {
+        window.print();
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = toast.querySelector('.toast-icon');
+        
+        toastMessage.textContent = message;
+        
+        if (type === 'error') {
+            toast.className = 'toast toast-error show';
+            toastIcon.textContent = '✕';
+        } else {
+            toast.className = 'toast toast-success show';
+            toastIcon.textContent = '✓';
+        }
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // Close modal on outside click
+    window.onclick = function(event) {
+        const modal = document.getElementById('detailModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+        if (e.ctrlKey && e.key === 'r') {
+            e.preventDefault();
+            refreshAll();
+        }
+    });
+</script>
+</body>
+</html>
