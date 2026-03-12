@@ -1317,17 +1317,17 @@ For office use only.
         try {
             showToast('Updating...', 'success');
             
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'updateStatus',
-                    ticketNumber: ticketNumber,
-                    newStatus: newStatus
-                })
-            });
+const response = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'text/plain;charset=utf-8',  // <-- Fix here
+    },
+    body: JSON.stringify({
+        action: 'updateStatus',
+        ticketNumber: ticketNumber,
+        newStatus: newStatus
+    })
+});
 
             const data = await response.json();
             
