@@ -1320,7 +1320,7 @@ For office use only.
 const response = await fetch(SCRIPT_URL, {
     method: 'POST',
     headers: {
-        'Content-Type': 'text/plain;charset=utf-8',  // <-- Fix here
+        'Content-Type': 'text/plain;charset=utf-8',  // ← USE THIS INSTEAD
     },
     body: JSON.stringify({
         action: 'updateStatus',
